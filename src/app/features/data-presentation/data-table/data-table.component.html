@@ -1,0 +1,35 @@
+<table class="table table-bordered align-middle">
+  <thead>
+    <tr>
+      <th scope="col" class="w-10">id</th>
+      <th scope="col" class="w-10">int</th>
+      <th scope="col" class="w-20">float</th>
+      <th scope="col" class="w-20">color</th>
+      <th scope="col" class="w-40">child</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let dataRow of data; trackBy : trackById">
+      <th scope="row">{{dataRow.id}}</th>
+      <td>{{dataRow.int}}</td>
+      <td>{{dataRow.float}}</td>
+      <td><span [style.background]="getColorValue(dataRow.color)">{{dataRow.color}}</span></td>
+      <td *ngIf="dataRow.child as child">
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+              <th scope="col" class="w-50">id</th>
+              <th scope="col" class="w-50">color</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">{{child.id}}</th>
+              <td><span [style.background]="getColorValue(child.color)">{{child.color}}</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </td>
+    </tr>
+  </tbody>
+</table>

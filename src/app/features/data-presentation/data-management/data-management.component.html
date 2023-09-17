@@ -1,0 +1,27 @@
+<div class="container-fluid py-3">
+  <form [formGroup]="managementForm">
+    <div class="row my-3">
+      <div class="form-group col-2">
+        <label for="timer">Timer, ms</label>
+        <input type="number" class="form-control" id="timer" formControlName="timer">
+        <div *ngIf="timer?.invalid && (timer?.dirty || timer?.touched)" class="alert">
+          <div *ngIf="timer?.errors?.['required']">
+            Timer is required.
+          </div>
+        </div>
+      </div>
+      <div class="form-group col-2">
+        <label for="arraySize">Array size</label>
+        <input type="number" class="form-control" id="arraySize" formControlName="arraySize">
+      </div>
+      <div class="form-group col-8">
+        <label for="arrayIds">Additional array ids</label>
+        <input type="text" class="form-control" id="arrayIds" formControlName="arrayIds">
+      </div>
+    </div>
+    <div class="row">
+      <button type="button" (click)="applySettings()" [disabled]="managementForm.invalid"
+        class="btn btn-primary">Apply</button>
+    </div>
+  </form>
+</div>

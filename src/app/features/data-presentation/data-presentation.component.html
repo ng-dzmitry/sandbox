@@ -1,0 +1,4 @@
+<div class="data-presentation my-4">
+  <app-data-management [settings]="initialSettings" (settingsChanged)="applySettings($event)"></app-data-management>
+  <app-data-table *ngIf="data$ | async as data" [data]="data"></app-data-table>
+</div>
