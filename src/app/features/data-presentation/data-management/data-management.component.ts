@@ -15,7 +15,7 @@ export class DataManagementComponent implements OnInit {
   managementForm = this.formBuilder.group({
     timer: [null, [Validators.required]], // todo add validation
     arraySize: [null, [Validators.required]],// todo add validation
-    arrayIds: []
+    arrayIds: ['']// todo add validation
   });
 
   constructor(private formBuilder: UntypedFormBuilder) {
@@ -23,7 +23,12 @@ export class DataManagementComponent implements OnInit {
 
   ngOnInit(): void {
     if (this.settings) {
-      this.managementForm.patchValue(this.settings);
+      const { timer, arraySize, arrayIds } = this.settings;
+      this.managementForm.patchValue({
+        timer,
+        arraySize,
+        arrayIds: arrayIds.join(','),
+      });
     }
   }
 
@@ -33,13 +38,19 @@ export class DataManagementComponent implements OnInit {
     }
 
     const { timer, arraySize, arrayIds } = this.managementForm.value;
+
+    const parsedIds = this.parseArrayIds(arrayIds || '');
     const settings: DataSettings = {
       timer,
       arraySize,
-      arrayIds
+      arrayIds: parsedIds
     }
 
     this.settingsChanged.emit(settings);
+  }
+
+  private parseArrayIds(ids: string): string[] {
+    return ids.replaceAll(' ', '').split(',').filter(x => !!x)
   }
 
 

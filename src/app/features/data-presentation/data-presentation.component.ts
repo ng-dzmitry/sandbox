@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
 import { DataSettings } from '../../core/models/data-settings';
-import { BehaviorSubject, Observable, Subscription, interval, map, scan, startWith, switchMap, } from 'rxjs';
+import { BehaviorSubject, Observable, Subscription, interval, map, scan, startWith, switchMap, withLatestFrom, } from 'rxjs';
 import { Data } from '../../core/models/data.model';
 import { generateData } from 'src/app/core/utils/data.utils';
 
@@ -14,7 +14,7 @@ export class DataPresentationComponent implements OnInit, OnDestroy {
   initialSettings: DataSettings =
     {
       timer: 3000,
-      arraySize: 3,
+      arraySize: 1,
       arrayIds: []
     };
 
@@ -33,16 +33,37 @@ export class DataPresentationComponent implements OnInit, OnDestroy {
     this.registerDataProducer();
 
     this.data$ = this.dataReceived$.pipe(
-      scan((acc, val) => {
+      withLatestFrom(this.settings$),
+      scan(({ items, idsMap }, [val, { arrayIds }]) => {
         // buffer items to show last 10
         if (val.length > this.amountOfItemsToDisplay) {
-          acc = val.slice(-this.amountOfItemsToDisplay);
-          return acc;
+          items = val.slice(-this.amountOfItemsToDisplay);
         } else {
-          acc.push(...val);
-          return acc.slice(-this.amountOfItemsToDisplay);
+          items.push(...val);
+          items = items.slice(-this.amountOfItemsToDisplay);
+
+          // swap ids back
+          items.forEach((item) => {
+            const id = idsMap.get(item.id)
+            if (id) {
+              item.id = id;
+              idsMap.delete(item.id);
+            }
+          });
         }
-      }, new Array<Data>())
+
+        // swap ids
+        arrayIds.forEach((value, index) => {
+          const item = items[index];
+          if (item) {
+            idsMap.set(value, item.id);
+            item.id = value;
+          }
+        });
+
+        return { items, idsMap };
+      }, { idsMap: new Map<string, string>(), items: new Array<Data>() }),
+      map(x => x.items)
     )
   }
 
